@@ -13,7 +13,7 @@ const handleChange = (e) => {
 		let xml = new DOMParser().parseFromString(reader.result, "text/xml");
 		var xmlText = new XMLSerializer().serializeToString(xml);
 		var xmlTextNode = document.createTextNode(xmlText);
-		root.appendChild(xmlTextNode);
+		rootEle.appendChild(xmlTextNode);
 		//getting the root element of the xml file
 		//
 		//getting the child elements of the root element
@@ -91,6 +91,8 @@ function showXml(ele, level, rootEle) {
 // }
 
 const handelSearch = (e) => {
+	//TODO: We should reset the DOM here
+
 	//A function to search and highlight the text in the element
 	const text = e.target.value;
 	//searching the element for given text
@@ -115,14 +117,21 @@ const handelSearch = (e) => {
 
 					//creating a new XML node with the highlighted text
 					let newNode = document.createElement("span");
+					newNode.style.backgroundColor = "yellow";
+					newNode.innerText = child[j].nodeValue.slice(0, index);
+					newNode.innerText += text;
+					newNode.innerText += child[j].nodeValue.slice(index + text.length);
+
+					let xml = new DOMParser().parseFromString(newNode, "text/xml");
+					var xmlText = new XMLSerializer().serializeToString(xml);
+					var xmlTextNode = document.createTextNode(xmlText);
+
 					child[j].nodeValue =
 						child[j].nodeValue.slice(0, index) +
-						`	&nbsp <highlight style="background-color: yellow;" id=${i}>` +
 						text +
-						"</highlight> 	&nbsp" +
 						child[j].nodeValue.slice(index + text.length);
 
-					//TODO:Find a way to refersh the dom without loosing the content
+					//TODO:Find a way to refresh the dom without loosing the content
 					//TODO: Way one parse this as an html document
 					//this will just highlight whole elemt
 					elems[i].style.backgroundColor = "yellow";
@@ -139,6 +148,7 @@ const handelSearch = (e) => {
 
 function displayMinimap() {
 	//Dispaying the items in minimap
+	const screenHeight = window.innerHeight;
 	let ele = document.getElementById("map");
 	tracker.forEach((element, index) => {
 		//margin = last element - current element + 1
@@ -149,11 +159,15 @@ function displayMinimap() {
 		newEelem.addEventListener("click", function (e) {
 			element.parent.scrollIntoView(true);
 		});
-		//preven
-		let margin =
+		//preventing it from overflowing the screen
+
+		let margin;
+
+		margin =
 			index === 0
-				? element.pos
+				? element.pos / 5 + 0.5
 				: (element.pos - tracker[index - 1].pos) / 5 + 0.5;
+
 		console.log(margin);
 		newEelem.style.marginTop = margin + "px";
 		ele.appendChild(newEelem);

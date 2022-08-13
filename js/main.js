@@ -1,61 +1,55 @@
-const tracker=[];
+const tracker = [];
 
-const handleChange = (e)=>{
-  const rootEle = document.getElementById('root');
-//accepting the xml file 
-  let file=e.target.files[0];
+const handleChange = (e) => {
+  const rootEle = document.getElementById("root");
+  //accepting the xml file
+  let file = e.target.files[0];
   //parsing the xml and showing it in the dom
-  let reader=new FileReader();
-  reader.onload=function(){
+  let reader = new FileReader();
+  reader.onload = function () {
     // rootEle.innerText=reader.result;
-   // hljs.highlightE(rootEle)
+    // hljs.highlightE(rootEle)
     //parsing the xml file
-    let xml=new DOMParser().parseFromString(reader.result,"text/xml");
+    let xml = new DOMParser().parseFromString(reader.result, "text/xml");
     //getting the root element of the xml file
-    let root=xml.documentElement;
+    let root = xml.documentElement;
     //getting the child elements of the root element
 
     //displaying the root element in the dom
-  //  rootEle.innerHTML=root.nodeName;
-    
+    //  rootEle.innerHTML=root.nodeName;
+
     //displaying the child elements of the root element in the dom
-    rootEle.innerHTML=reader.result;
+    rootEle.innerHTML = reader.result;
     //showXml(root,0,rootEle);
-}
+  };
 
-reader.readAsText(file);
-
-}
-;
-
+  reader.readAsText(file);
+};
 //a recusrsive function to show the xml in the DOM
-function showXml(ele,level,rootEle){
+function showXml(ele, level, rootEle) {
   //getting the child elements of the root element
-  let child=ele.childNodes;
-  for(let i=0;i<child.length;i++){
+  let child = ele.childNodes;
+  for (let i = 0; i < child.length; i++) {
     //if the child element is an element
-    if(child[i].nodeType==1){
+    if (child[i].nodeType == 1) {
       //displaying the child element in the dom
-      let ele=document.createElement(child[i].nodeName);
-      ele.innerText=child[i].nodeName;
-      ele.style.marginLeft=level*20+"px";
+      let ele = document.createElement(child[i].nodeName);
+      ele.innerText = child[i].nodeName;
+      ele.style.marginLeft = level * 20 + "px";
       rootEle.appendChild(ele);
       //calling the function recursively to show the child elements of the child element
-      showXml(child[i],level+1,rootEle);
+      showXml(child[i], level + 1, rootEle);
     }
     //if the child element is a text node
-    else if(child[i].nodeType==3){
+    else if (child[i].nodeType == 3) {
       //displaying the text node in the dom
-      let ele=document.createElement("span");
-      ele.innerText=child[i].nodeValue;
-      ele.style.marginLeft=level*20+"px";
+      let ele = document.createElement("span");
+      ele.innerText = child[i].nodeValue;
+      ele.style.marginLeft = level * 20 + "px";
       rootEle.appendChild(ele);
     }
   }
 }
-
-
-
 
 // const handelSearch = (e)=>{
 //   const text=e.target.value
@@ -75,7 +69,7 @@ function showXml(ele,level,rootEle){
 //           //getting the index of text to be highlight
 //         elements[j]=elements[j].replace(`<span class="highlight">${elements[j]}</span>`);
 //           //highlighting the words
-          
+
 //           //elems[i].style.backgroundColor="yellow";
 //         }
 //         else{
@@ -93,55 +87,29 @@ function showXml(ele,level,rootEle){
 
 // }
 
-
-const handelSearch = (e)=>{
-//A function to search and highlight the text in the element
-  const text=e.target.value
-  //searching the element for given text
-  let ele=document.getElementById("root");
-  //searching the element for given text
-  let elems=ele.getElementsByTagName("*");
-  
-//TODO: we need to remember the position of the element
-
-
-  for(let i=0;i<elems.length;i++){
-  if(elems[i].innerText.includes(text)){
-   let child=elems[i].childNodes;
-    for(let j=0;j<child.length;j++){
-        if(child[j].nodeValue&&child[j].nodeValue.includes(text)){
-          console.log(child[j].nodeValue)
-          let index=child[j].nodeValue.indexOf(text);
-          tracker.push({pos:i,elem:child[j].nodeValue});
-          child[j].nodeValue=child[j].nodeValue.slice(0,index)+"<span class='highlight'>"+text+"</span>"+child[j].nodeValue.slice(index+text.length);
-          
-          //TODO:Find a way to refersh the dom without loosing the content
-          //TODO: Way one parse this as an html document
-          //this will just highlight whole elemt
-          elems[i].style.backgroundColor = "yellow";
-        }
-      }
+const handelSearch = (e) => {
+  let searched = document.getElementById("search").value.trim();
+  console.log(searched);
+  if (searched !== "") {
+    let text = document.getElementById("root").innerHTML;
+    let re = new RegExp(searched, "g"); // search for all instances
+    let newText = text.replace(re, `<mark>${searched}</mark>`);
+    document.getElementById("root").innerHTML = newText;
   }
+  displayMinimap();
+};
 
-}
-displayMinimap()
-}
-
-
-
-function displayMinimap(){
-  console.log("here")
-//Dispaying the items in minimap
-  let ele=document.getElementById("map");
-  tracker.forEach((element,index) => {
+function displayMinimap() {
+  console.log("here");
+  //Dispaying the items in minimap
+  let ele = document.getElementById("map");
+  tracker.forEach((element, index) => {
     //margin = last element - current element + 1
-    const newEelem=document.createElement("div");
+    const newEelem = document.createElement("div");
     newEelem.classList.add("minimap-item");
-    let margin =
-    index === 0? 0:element.pos- tracker[index - 1].pos+  5;
-    console.log(margin)
-    newEelem.style.marginTop=margin+"px";
+    let margin = index === 0 ? 0 : element.pos - tracker[index - 1].pos + 5;
+    console.log(margin);
+    newEelem.style.marginTop = margin + "px";
     ele.appendChild(newEelem);
-  } );
-
+  });
 }

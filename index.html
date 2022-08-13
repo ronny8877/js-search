@@ -17,19 +17,31 @@
   }
   .minimap-item{
     background-color: red;
-    
+    display:flex;
+    flex-wrap: wrap;
     color:red;
+    cursor:pointer;
     width: 100%;
-    min-height: 1px;
+    min-height:2px;
   }
+
+  .minimap-item:hover{
+    background-color: red;
+    color:white;
+    height:3px;
+    border: 1px solid black;
+  }
+
   .mini-map{
 position: fixed;
 top: 0;
 right: 0;
-min-width: 100px;
+min-width: 50px;
 background-color: aqua;
+max-height: 100vh;
 min-height: 100vh;
-overflow: scroll;
+
+
   }
   body{
     background-color: #f5f5f5;
@@ -40,11 +52,11 @@ overflow: scroll;
 </style>
 </head>
 <body >
-  <div class="mini-map" id="map"></div>
+  <div class="mini-map" hidden id="map"></div>
   <input type="text" id="search" onchange="handelSearch(event)">
 
   <input type="file" id="file" name="file" accept=".xml" onchange="handleChange(event)">
- <div id="root"></div>
+ <div id="root"><div/>
 </body>
 <script src="/js/main.js" > </script>
 </html>

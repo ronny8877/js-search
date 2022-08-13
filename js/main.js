@@ -54,41 +54,6 @@ function showXml(ele, level, rootEle) {
 	}
 }
 
-// const handelSearch = (e)=>{
-//   const text=e.target.value
-//   //searching the element for given text
-//   let ele=document.getElementById("root");
-
-//   //searching the element for given text
-//   let elems=ele.getElementsByTagName("*");
-//   for(let i=0;i<elems.length;i++){
-//     if(elems[i].innerText.includes(text)){
-//      //find the words in the element
-//      let regex = new RegExp(/G[ab].*/i);
-//       let elements=elems[i].innerText.split(" ");
-//       for(let j=0;j<elements.length;j++){;
-//         if(elements[j].includes(text)){
-//           //highlight the words
-//           //getting the index of text to be highlight
-//         elements[j]=elements[j].replace(`<span class="highlight">${elements[j]}</span>`);
-//           //highlighting the words
-
-//           //elems[i].style.backgroundColor="yellow";
-//         }
-//         else{
-//           elems[i].style.backgroundColor="white";
-//         }
-//       }
-//       //getting the index of the text from match array
-//       // let index=match.indexOf(text.toLowerCase());
-//       // console.log(index)
-//       // //highlighting the element with the text
-//       // elems[i].innerHTML=elems[i].innerText.slice(0,index)+"<span class='highlight'>"+text+"</span>"+elems[i].innerText.slice(index+text.length);
-
-//     }
-//   }
-
-// }
 
 const handelSearch = (e) => {
 	//TODO: We should reset the DOM here
@@ -102,6 +67,14 @@ const handelSearch = (e) => {
 
 	//TODO: we need to remember the position of the element
 
+	function getOffset(el) {
+		const rect = el.getBoundingClientRect();
+		return {
+			left: rect.left + window.scrollX,
+			top: rect.top + window.scrollY,
+		};
+	}
+
 	for (let i = 0; i < elems.length; i++) {
 		if (elems[i].innerText.includes(text)) {
 			let child = elems[i].childNodes;
@@ -109,32 +82,28 @@ const handelSearch = (e) => {
 				if (child[j].nodeValue && child[j].nodeValue.includes(text)) {
 					console.log(child[j].nodeValue);
 					let index = child[j].nodeValue.indexOf(text);
+					//getting the elements margin from top of the scree
+
 					tracker.push({
+						margin: getOffset(elems[i]),
 						pos: i,
 						elem: child[j].nodeValue,
 						parent: child[j].parentNode,
 					});
 
 					//creating a new XML node with the highlighted text
-					let newNode = document.createElement("span");
-					newNode.style.backgroundColor = "yellow";
-					newNode.innerText = child[j].nodeValue.slice(0, index);
-					newNode.innerText += text;
-					newNode.innerText += child[j].nodeValue.slice(index + text.length);
-
-					let xml = new DOMParser().parseFromString(newNode, "text/xml");
-					var xmlText = new XMLSerializer().serializeToString(xml);
-					var xmlTextNode = document.createTextNode(xmlText);
 
 					child[j].nodeValue =
 						child[j].nodeValue.slice(0, index) +
+						"<span style='background:yellow;' >" +
 						text +
-						child[j].nodeValue.slice(index + text.length);
+						"</span>";
+					child[j].nodeValue.slice(index + text.length);
 
 					//TODO:Find a way to refresh the dom without loosing the content
 					//TODO: Way one parse this as an html document
 					//this will just highlight whole elemt
-					elems[i].style.backgroundColor = "yellow";
+					//elems[i].style.backgroundColor = "yellow";
 				}
 			}
 		}
@@ -148,8 +117,10 @@ const handelSearch = (e) => {
 
 function displayMinimap() {
 	//Dispaying the items in minimap
-	const screenHeight = window.innerHeight;
+
+	//const screenHeight = window.innerHeight;
 	let ele = document.getElementById("map");
+	ele.removeAttribute("hidden");
 	tracker.forEach((element, index) => {
 		//margin = last element - current element + 1
 
@@ -159,8 +130,8 @@ function displayMinimap() {
 		newEelem.addEventListener("click", function (e) {
 			element.parent.scrollIntoView(true);
 		});
-		//preventing it from overflowing the screen
 
+		//preventing it from overflowing the screen
 		let margin;
 
 		margin =
@@ -168,7 +139,6 @@ function displayMinimap() {
 				? element.pos / 5 + 0.5
 				: (element.pos - tracker[index - 1].pos) / 5 + 0.5;
 
-		console.log(margin);
 		newEelem.style.marginTop = margin + "px";
 		ele.appendChild(newEelem);
 	});

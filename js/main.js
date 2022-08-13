@@ -26,124 +26,147 @@ const handleChange = (e) => {
 	reader.readAsText(file);
 };
 
-// }
 
-const handelSearch = (e) => {
-	//A function to search and highlight the text in the element
-	const text = e.target.value;
-	//searching the element for given text
-	let ele = document.getElementById("root");
-	//searching the element for given text
-	let elems = ele.getElementsByTagName("*");
+	function getOffset(el) {
+		const rect = el.getBoundingClientRect();
+		return {
+			left: rect.left + window.scrollX,
+			top: rect.top + window.scrollY,
+		};
+	}
+	// }
+	const handelSearch = (e) => {
+		//TODO: We should reset the DOM here
 
-	//TODO: we need to remember the position of the element
+		//A function to search and highlight the text in the element
+		const text = e.target.value;
+		//searching the element for given text
+		let ele = document.getElementById("root");
+		//searching the element for given text
+		let elems = ele.getElementsByTagName("*");
+		//TODO: we need to remember the position of the element
+		for (let i = 0; i < elems.length; i++) {
+			if (elems[i].innerText.includes(text)) {
+				let child = elems[i].childNodes;
+				for (let j = 0; j < child.length; j++) {
+					if (child[j].nodeValue && child[j].nodeValue.includes(text)) {
+						console.log(child[j].nodeValue);
+						let index = child[j].nodeValue.indexOf(text);
+						tracker.push({
+							pos: i,
+							elem: child[j].nodeValue,
+							parent: child[j].parentNode,
+							offset: getOffset(child[j].parentNode),
+						});
 
-	for (let i = 0; i < elems.length; i++) {
-		if (elems[i].innerText.includes(text)) {
-			let child = elems[i].childNodes;
-			for (let j = 0; j < child.length; j++) {
-				if (child[j].nodeValue && child[j].nodeValue.includes(text)) {
-					console.log(child[j].nodeValue);
-					let index = child[j].nodeValue.indexOf(text);
-					tracker.push({
-						pos: i,
-						elem: child[j].nodeValue,
-						parent: child[j].parentNode,
-					});
-					child[j].nodeValue =
-						child[j].nodeValue.slice(0, index) +
-						"<mark '>" +
-						text +
-						"</mark>" +
-						child[j].nodeValue.slice(index + text.length);
+						//creating a new XML node with the highlighted text
 
-					//TODO:Find a way to refersh the dom without loosing the content
-					//TODO: Way one parse this as an html document
-					//this will just highlight whole elemt
-					elems[i].style.backgroundColor = "yellow";
+						// newText =
+						// 	child[j].nodeValue.slice(0, index) +
+						// 	`<mark>
+						// 	${text }
+						// 	</mark>` +
+						// 	child[j].nodeValue.slice(index + text.length);
+
+						//TODO:Find a way to refersh the dom without loosing the content
+						//TODO:Find a way to refresh the dom without loosing the content
+						//TODO: Way one parse this as an html document
+						//this will just highlight whole elemt
+						//elems[i].style.backgroundColor = "yellow";
+					}
 				}
 			}
 		}
-	}
-	displayMinimap();
-};
 
-// const handelSearch = (e) => {
-// 	const text = e.target.value;
-// 	//searching the element for given text
-// 	let ele = document.getElementById("root");
-// 	let newText;
+		ele.innerHTML = ele.innerHTML.replace(
+			new RegExp(text, "g"),
+			`<mark>${text}</mark>`
+		);
 
-// 	let re = new RegExp(text, "g");
-// 	//searching the element for given text
-// 	let elems = ele.getElementsByTagName("*");
-// 	for (let i = 0; i < elems.length; i++) {
-// 		if (re.test(elems[i].innerText)) {
-// 			console.log(re.test(elems[i].innerText));
-// 			newText = elems[i].innerText.replace(
-// 				re,
-// 				`<mark style="background:red" >${text}</mark>`
-// 			);
-// 		}
-// 	}
-// };
-// let elements = elems[i].innerText.split(" ");
-// //find the words in the element
-// for (let j = 0; j < elements.length; j++) {
-//   if (elements[j].includes(text)) {
+		displayMinimap();
+	};
 
-//     let re = new RegExp(text, "g"); // search for all instances
-//     newText = text.replace(
-//       re,
-//       `<mark style="background:red" >${text}</mark>`
-//       );
-//       //highlight the words
-//       //getting the index of text to be highlight
-//       elements[j] = newText;
-//       //highlighting the words
+	// const handelSearch = (e) => {
+	// 	const text = e.target.value;
+	// 	//searching the element for given text
+	// 	let ele = document.getElementById("root");
+	// 	let newText;
 
-//       //elems[i].style.backgroundColor="yellow";
-//     //}
+	// 	let re = new RegExp(text, "g");
+	// 	//searching the element for given text
+	// 	let elems = ele.getElementsByTagName("*");
+	// 	for (let i = 0; i < elems.length; i++) {
+	// 		if (re.test(elems[i].innerText)) {
+	// 			console.log(re.test(elems[i].innerText));
+	// 			newText = elems[i].innerText.replace(
+	// 				re,
+	// 				`<mark style="background:red" >${text}</mark>`
+	// 			);
+	// 		}
+	// 	}
+	// };
+	// let elements = elems[i].innerText.split(" ");
+	// //find the words in the element
+	// for (let j = 0; j < elements.length; j++) {
+	//   if (elements[j].includes(text)) {
 
-// const handelSearch = (e) => {
-// 	let searched = document.getElementById("search").value.trim();
-// 	console.log(searched);
-// 	if (searched !== "") {
-// 		let text = document.getElementById("root").innerHTML;
-// 		let re = new RegExp(searched, "g"); // search for all instances
-// 		console.log(re);
-// 		let newText = text.replace(
-// 			re,
-// 			`<mark style="background:red" >${searched}</mark>`
-// 		);
-// 		document.getElementById("root").innerHTML = newText;
-// 	}
-// 	displayMinimap();
-// };
+	//     let re = new RegExp(text, "g"); // search for all instances
+	//     newText = text.replace(
+	//       re,
+	//       `<mark style="background:red" >${text}</mark>`
+	//       );
+	//       //highlight the words
+	//       //getting the index of text to be highlight
+	//       elements[j] = newText;
+	//       //highlighting the words
 
-function displayMinimap() {
-	console.log("here");
-	//Dispaying the items in minimap
-	let ele = document.getElementById("map");
-	ele.removeAttribute("hidden");
-	tracker.forEach((element, index) => {
-		//margin = last element - current element + 1
-		const newEelem = document.createElement("div");
+	//       //elems[i].style.backgroundColor="yellow";
+	//     //}
 
-		newEelem.classList.add("minimap-item");
-		newEelem.addEventListener("click", () => {
-			element.parent.scrollIntoView({
-				behavior: "smooth",
-				block: "center",
-				inline: "nearest",
+	// const handelSearch = (e) => {
+	// 	let searched = document.getElementById("search").value.trim();
+	// 	console.log(searched);
+	// 	if (searched !== "") {
+	// 		let text = document.getElementById("root").innerHTML;
+	// 		let re = new RegExp(searched, "g"); // search for all instances
+	// 		console.log(re);
+	// 		let newText = text.replace(
+	// 			re,
+	// 			`<mark style="background:red" >${searched}</mark>`
+	// 		);
+	// 		document.getElementById("root").innerHTML = newText;
+	// 	}
+	// 	displayMinimap();
+	// };
+
+	function displayMinimap() {
+		//Dispaying the items in minimap
+		console.log(tracker);
+		//const screenHeight = window.innerHeight;
+		let ele = document.getElementById("map");
+		ele.removeAttribute("hidden");
+		tracker.forEach((element, index) => {
+			const newEelem = document.createElement("div");
+			newEelem.classList.add("minimap-item");
+			//margin = last element - current element + 1
+			newEelem.addEventListener("click", function (e) {
+				scrollBy({
+					top: element.offset.top - window.scrollY,
+					behavior: "smooth",
+				});
 			});
+			//preventing it from overflowing the screen
+
+			//preventing it from overflowing the screen
+			let margin;
+
+			margin =
+				index === 0
+					? element.pos / 5 + 0.5
+					: (element.pos - tracker[index - 1].pos) / 5 + 0.5;
+
+			console.log(margin);
+			newEelem.style.marginTop = margin + "px";
+			ele.appendChild(newEelem);
 		});
-		let margin =
-			index === 0
-				? element.pos / 5
-				: element.pos - tracker[index - 1].pos / 5 + 1;
-		console.log(margin);
-		newEelem.style.marginTop = margin + "px";
-		ele.appendChild(newEelem);
-	});
-}
+	}

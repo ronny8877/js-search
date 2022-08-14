@@ -5,57 +5,32 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Xml Search</title>
-  <link rel="stylesheet"
-      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/default.min.css">
-<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
-<script>hljs.highlightAll();</script>
-
-<style>
-  .highlight{
-    background-color: #f5f5f5;
-    color:red;
-  }
-  .minimap-item{
-    background-color: red;
-    display:flex;
-    flex-wrap: wrap;
-    color:red;
-    cursor:pointer;
-    width: 100%;
-    min-height:2px;
-  }
-
-  .minimap-item:hover{
-    background-color: red;
-    color:white;
-    height:3px;
-    border: 1px solid black;
-  }
-
-  .mini-map{
-position: fixed;
-top: 0;
-right: 0;
-min-width: 50px;
-background-color: aqua;
-max-height: 100vh;
-min-height: 100vh;
-
-
-  }
-  body{
-    background-color: #f5f5f5;
-    position: relative;
-    padding: 0;
-    margin: 0;
-  }
+  <link rel="stylesheet" href="css/normalize.css">
+ <link rel="stylesheet" href="/css/main.css"/>
 </style>
 </head>
 <body >
+
+ <!-- <div hidden class="toast">
+<span>Hi</span>
+ </div> -->
+<div class="upload-component" hidden id="upload-component">
+  <div>
+<img src="/assets/folder.png" alt="folder" class="folder-icon">
+    <input hidden type="file" id="file" name="file" accept=".xml" onchange="handleChange(event)">
+   <h1>Search</h1>
+    <button onclick="handelUploadFile()" class="btn">Upload File</button>
+  </div>
+  
+</div>
+  
+
+<div id="search-component"   hidden>
+
   <div class="mini-map" hidden id="map"></div>
   <input type="text" id="search" onchange="handelSearch(event)">
-
-  <input type="file" id="file" name="file" accept=".xml" onchange="handleChange(event)">
+  
+</div>
  <div id="root"><div/>
 </body>
 <script src="/js/main.js" > </script>

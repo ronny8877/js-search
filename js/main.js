@@ -40,7 +40,7 @@ function getOffset(el) {
 
 
 //a recursive function to find the text in the DOM
-function findText(elem, text) {
+function findText(elem, text, bg) {
 	//checking if the element is a text node
 	if (elem.nodeType === 3) {
 		//matching the text in the text node
@@ -49,7 +49,7 @@ function findText(elem, text) {
 			const newChild = document.createElement("span");
 			newChild.innerHTML = elem.nodeValue.replace(
 				new RegExp(text, "g"),
-				`<mark>${text}</mark>`
+				`<mark style="background:${bg}">${text}</mark>`
 			);
 			tracker.push({
 				pos: elem.nodeValue.indexOf(text),
@@ -59,24 +59,20 @@ function findText(elem, text) {
 			});
 			//replacing the text node with the mark element
 			elem.parentNode.replaceChild(newChild, elem);
-
-
-		
 		}
-
 	} else {
 		//if the element is not a text node then check its children
 		for (let i = 0; i < elem.childNodes.length; i++) {
-			findText(elem.childNodes[i], text);
+			findText(elem.childNodes[i], text, bg);
 		}
 	}
 	return elem.outerHTML;
 }
 
-
 const handelSearch = (e) => {
+	let bg = "#45ff";
 	//TODO: We should reset the DOM here
-let newText =findText(rootEle, e.target.value);
+	let newText = findText(rootEle, e.target.value, bg);
 	//A function to search and highlight the text in the element
 	const text = e.target.value;
 	//searching the element for given text
@@ -88,7 +84,7 @@ let newText =findText(rootEle, e.target.value);
 	// });
 	//searching the element for given text
 	console.log(newText);
-	rootEle.innerHTML= newText
+	rootEle.innerHTML = newText;
 
 	//console.log(elems);
 	// for (let i = 0; i < elems.length; i++) {

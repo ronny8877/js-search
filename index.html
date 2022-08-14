@@ -10,14 +10,15 @@
 </style>
 </head>
 <body >
+  <div class="mini-map" hidden id="map"></div>
 
  <!-- <div hidden class="toast">
 <span>Hi</span>
  </div> -->
-<div class="upload-component" hidden id="upload-component">
+<div class="upload-component"  id="upload-component">
   <div>
 <img src="/assets/folder.png" alt="folder" class="folder-icon">
-    <input hidden type="file" id="file" name="file" accept=".xml" onchange="handleChange(event)">
+    <input hidden type="file" id="file" name="file" accept=".xml" onchange="handleChange(event)"/ >
    <h1>Search</h1>
     <button onclick="handelUploadFile()" class="btn">Upload File</button>
   </div>
@@ -25,11 +26,11 @@
 </div>
   
 
-<div id="search-component"   hidden>
-
-  <div class="mini-map" hidden id="map"></div>
-  <input type="text" id="search" onchange="handelSearch(event)">
+<div hidden id="search-component">
+  <input type="search" id="search" class="search-bar"/>
+  <input type="color" id="search-color" />
   
+      <button onclick="handelSearch()" class="btn">Search</button>
 </div>
  <div id="root"><div/>
 </body>

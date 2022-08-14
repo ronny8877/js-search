@@ -3,6 +3,16 @@ const fileInputElement = document.getElementById("file");
 const rootEle = document.getElementById("root");
 const uploadComponent = document.getElementById("upload-component");
 const searchComponent = document.getElementById("search-component");
+const minimap = document.getElementById("map");
+
+
+
+//TODO: THe search should not be listed here as we will spawn more then one element 
+//programmatically then it will be a mess up
+
+const searchBar = document.getElementById("search");
+const colorBar = document.getElementById("search-color");
+
 let file, xmlDoc;
 
 const handelUploadFile = () => {
@@ -18,7 +28,6 @@ const handleChange = (e) => {
 	let reader = new FileReader();
 	reader.onload = function () {
 		xmlDoc = new DOMParser().parseFromString(reader.result, "text/xml");
-
 		rootEle.innerHTML = xmlDoc.documentElement.outerHTML;
 		//showXml(root,0,rootEle);
 	};
@@ -38,7 +47,6 @@ function getOffset(el) {
 }
 // }
 
-
 //a recursive function to find the text in the DOM
 function findText(elem, text, bg) {
 	//checking if the element is a text node
@@ -46,15 +54,16 @@ function findText(elem, text, bg) {
 		//matching the text in the text node
 		if (elem.nodeValue.match(new RegExp(text, "g"))) {
 			//creating the mark element
+			let id = Math.random().toString(36).substr(2, 9);
 			const newChild = document.createElement("span");
 			newChild.innerHTML = elem.nodeValue.replace(
 				new RegExp(text, "g"),
-				`<mark style="background:${bg}">${text}</mark>`
+				`<mark id=${id}  style="background:${bg}">${text}</mark>`
 			);
 			tracker.push({
-				pos: elem.nodeValue.indexOf(text),
+				bg,
+				id,
 				elem: elem.nodeValue,
-				parent: elem.parentNode,
 				offset: getOffset(elem.parentNode),
 			});
 			//replacing the text node with the mark element
@@ -69,56 +78,32 @@ function findText(elem, text, bg) {
 	return elem.outerHTML;
 }
 
-const handelSearch = (e) => {
-	let bg = "#45ff";
-	//TODO: We should reset the DOM here
-	let newText = findText(rootEle, e.target.value, bg);
-	//A function to search and highlight the text in the element
-	const text = e.target.value;
-	//searching the element for given text
-	// tracker.push({
-	// 	pos: i,
-	// 	elem: child[j].nodeValue,
-	// 	parent: child[j].parentNode,
-	// 	offset: getOffset(child[j].parentNode),
-	// });
-	//searching the element for given text
-	console.log(newText);
+const handelSearch = () => {
+	let highlightColor = colorBar.value;
+	let text = searchBar.value;
+	if (text === "") {
+		alert("Please Enter a Text");
+		return;
+	}
+	if (!xmlDoc) {
+		return alert("Something went wrong");
+	}
+
+	//Resetting the doc here
+	//Empty the tracker array
+	tracker.length = 0;
+	//Empty the minimap
+	minimap.innerHTML = "";
+	rootEle.innerHTML = xmlDoc.documentElement.outerHTML;
+	let newText = findText(rootEle, text, highlightColor);
+
 	rootEle.innerHTML = newText;
-
-	//console.log(elems);
-	// for (let i = 0; i < elems.length; i++) {
-	// 	console.log(elems[i]);
-	// }
-
-	// for (let i = 0; i < elems.length; i++) {
-	// 	if (elems[i].innerHTML.match(re)) {
-	// 		tracker.push({
-	// 			pos: i,
-	// 			elem: elems[i].innerHTML,
-	// 			parent: elems[i].parentNode,
-	// 			offset: getOffset(elems[i].parentNode),
-	// 		});
-	// 		elems[i].innerHTML = elems[i].innerHTML.replace(
-	// 			new RegExp(text, "g"),
-	// 			`<mark>${text}</mark>`
-	// 		);
-	// 	}
-	// 	console.log("replacing");
-	// }
-
-	//THis is where the magix happens wht's
-	// rootEle.innerHTML = rootEle.innerHTML.replace(
-	// 	new RegExp(text, "g"),
-	// 	`<mark>${text}</mark>`
-	// );
 
 	displayMinimap();
 };
 
-
 function displayMinimap() {
-	//Dispaying the items in minimap
+	//Displaying the items in minimap
 	console.log(tracker);
 	//const screenHeight = window.innerHeight;
 	let ele = document.getElementById("map");
@@ -128,24 +113,19 @@ function displayMinimap() {
 		newEelem.classList.add("minimap-item");
 		//margin = last element - current element + 1
 		newEelem.addEventListener("click", function (e) {
-			scrollBy({
-				top: element.offset.top - window.scrollY,
+			document.getElementById(element.id).scrollIntoView({
 				block: "center",
 			});
-			console.log(element.offset.top - window.scrollY);
 		});
-		//preventing it from overflowing the screen
 
-		//preventing it from overflowing the screen
+		//calculating the margin to fit the elements in the screen
 		let margin;
 
-		margin =
-			index === 0
-				? element.pos / 5 + 0.5
-				: (element.pos - tracker[index - 1].pos) / 5 + 0.5;
-
-		console.log(margin);
-		newEelem.style.marginTop = margin + "px";
+		//11.5 ?? magic number this is giving the ans
+		margin = (element.offset.top / screen.height) * (screen.height / 10);
+		newEelem.style.top = margin + "px";
+		newEelem.style.background = element.bg;
+		newEelem.style.position = "absolute";
 		ele.appendChild(newEelem);
 	});
 }

@@ -37,9 +37,46 @@ function getOffset(el) {
 	};
 }
 // }
+
+
+//a recursive function to find the text in the DOM
+function findText(elem, text) {
+	//checking if the element is a text node
+	if (elem.nodeType === 3) {
+		//matching the text in the text node
+		if (elem.nodeValue.match(new RegExp(text, "g"))) {
+			//creating the mark element
+			const newChild = document.createElement("span");
+			newChild.innerHTML = elem.nodeValue.replace(
+				new RegExp(text, "g"),
+				`<mark>${text}</mark>`
+			);
+			tracker.push({
+				pos: elem.nodeValue.indexOf(text),
+				elem: elem.nodeValue,
+				parent: elem.parentNode,
+				offset: getOffset(elem.parentNode),
+			});
+			//replacing the text node with the mark element
+			elem.parentNode.replaceChild(newChild, elem);
+
+
+		
+		}
+
+	} else {
+		//if the element is not a text node then check its children
+		for (let i = 0; i < elem.childNodes.length; i++) {
+			findText(elem.childNodes[i], text);
+		}
+	}
+	return elem.outerHTML;
+}
+
+
 const handelSearch = (e) => {
 	//TODO: We should reset the DOM here
-
+let newText =findText(rootEle, e.target.value);
 	//A function to search and highlight the text in the element
 	const text = e.target.value;
 	//searching the element for given text
@@ -50,11 +87,10 @@ const handelSearch = (e) => {
 	// 	offset: getOffset(child[j].parentNode),
 	// });
 	//searching the element for given text
-	let elems = rootEle.getElementsByTagName("*");
+	console.log(newText);
+	rootEle.innerHTML= newText
 
-	let re = new RegExp(text, "g");
-
-	console.log(elems[0]);
+	//console.log(elems);
 	// for (let i = 0; i < elems.length; i++) {
 	// 	console.log(elems[i]);
 	// }
@@ -84,58 +120,6 @@ const handelSearch = (e) => {
 	displayMinimap();
 };
 
-// const handelSearch = (e) => {
-// 	const text = e.target.value;
-// 	//searching the element for given text
-// 	let ele = document.getElementById("root");
-// 	let newText;
-
-// 	let re = new RegExp(text, "g");
-// 	//searching the element for given text
-// 	let elems = ele.getElementsByTagName("*");
-// 	for (let i = 0; i < elems.length; i++) {
-// 		if (re.test(elems[i].innerText)) {
-// 			console.log(re.test(elems[i].innerText));
-// 			newText = elems[i].innerText.replace(
-// 				re,
-// 				`<mark style="background:red" >${text}</mark>`
-// 			);
-// 		}
-// 	}
-// };
-// let elements = elems[i].innerText.split(" ");
-// //find the words in the element
-// for (let j = 0; j < elements.length; j++) {
-//   if (elements[j].includes(text)) {
-
-//     let re = new RegExp(text, "g"); // search for all instances
-//     newText = text.replace(
-//       re,
-//       `<mark style="background:red" >${text}</mark>`
-//       );
-//       //highlight the words
-//       //getting the index of text to be highlight
-//       elements[j] = newText;
-//       //highlighting the words
-
-//       //elems[i].style.backgroundColor="yellow";
-//     //}
-
-// const handelSearch = (e) => {
-// 	let searched = document.getElementById("search").value.trim();
-// 	console.log(searched);
-// 	if (searched !== "") {
-// 		let text = document.getElementById("root").innerHTML;
-// 		let re = new RegExp(searched, "g"); // search for all instances
-// 		console.log(re);
-// 		let newText = text.replace(
-// 			re,
-// 			`<mark style="background:red" >${searched}</mark>`
-// 		);
-// 		document.getElementById("root").innerHTML = newText;
-// 	}
-// 	displayMinimap();
-// };
 
 function displayMinimap() {
 	//Dispaying the items in minimap

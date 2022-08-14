@@ -106,8 +106,8 @@ function displayMinimap() {
 	//Displaying the items in minimap
 	console.log(tracker);
 	//const screenHeight = window.innerHeight;
-	let ele = document.getElementById("map");
-	ele.removeAttribute("hidden");
+
+	minimap.removeAttribute("hidden");
 	tracker.forEach((element, index) => {
 		const newEelem = document.createElement("div");
 		newEelem.classList.add("minimap-item");
@@ -121,11 +121,28 @@ function displayMinimap() {
 		//calculating the margin to fit the elements in the screen
 		let margin;
 
-		//11.5 ?? magic number this is giving the ans
-		margin = (element.offset.top / screen.height) * (screen.height / 10);
+		margin =
+			(element.offset.top / minimap.offsetHeight) *
+			(minimap.offsetHeight / (rootEle.offsetHeight / minimap.offsetHeight));
 		newEelem.style.top = margin + "px";
 		newEelem.style.background = element.bg;
 		newEelem.style.position = "absolute";
-		ele.appendChild(newEelem);
+		minimap.appendChild(newEelem);
 	});
 }
+
+const scrollToCustom = () => {
+	//scrolling to top of element
+	console.log("here");
+	window.scrollTo(0, 0);
+};
+
+window.addEventListener("scroll", () => {
+	//scrolling to top of element
+	let sc = document.getElementById("to-top");
+	if (window.scrollY > window.innerHeight) {
+		sc.style.display = "block";
+	} else {
+		sc.style.display = "none";
+	}
+});

@@ -1,13 +1,12 @@
 const tracker = [];
+let toBeSearched = [];
 const fileInputElement = document.getElementById("file");
 const rootEle = document.getElementById("root");
 const uploadComponent = document.getElementById("upload-component");
 const searchComponent = document.getElementById("search-component");
 const minimap = document.getElementById("map");
 
-
-
-//TODO: THe search should not be listed here as we will spawn more then one element 
+//TODO: THe search should not be listed here as we will spawn more then one element
 //programmatically then it will be a mess up
 
 const searchBar = document.getElementById("search");
@@ -48,7 +47,7 @@ function getOffset(el) {
 // }
 
 //a recursive function to find the text in the DOM
-function findText(elem, text, bg) {
+function findText(elem, text, bg, pos) {
 	//checking if the element is a text node
 	if (elem.nodeType === 3) {
 		//matching the text in the text node
@@ -61,9 +60,9 @@ function findText(elem, text, bg) {
 				`<mark id=${id}  style="background:${bg}">${text}</mark>`
 			);
 			tracker.push({
+				pos,
 				bg,
 				id,
-				elem: elem.nodeValue,
 				offset: getOffset(elem.parentNode),
 			});
 			//replacing the text node with the mark element
@@ -72,19 +71,31 @@ function findText(elem, text, bg) {
 	} else {
 		//if the element is not a text node then check its children
 		for (let i = 0; i < elem.childNodes.length; i++) {
-			findText(elem.childNodes[i], text, bg);
+			findText(elem.childNodes[i], text, bg, pos);
 		}
 	}
 	return elem.outerHTML;
 }
 
 const handelSearch = () => {
-	let highlightColor = colorBar.value;
-	let text = searchBar.value;
-	if (text === "") {
-		alert("Please Enter a Text");
-		return;
-	}
+	let searchWrapper = searchComponent.querySelectorAll(".search-wrapper");
+	toBeSearched = [];
+	//checking all the search elements
+	searchWrapper.forEach((element) => {
+		//getting the text from the element
+		let text = element.querySelector('input[type="search"]').value;
+		//getting the color from the element
+		let bg = element.querySelector('input[type="color"]').value;
+		//if the text is not empty then search for the text
+		if (text && bg) {
+			//search for the text in the DOM
+			toBeSearched.push({
+				text,
+				bg,
+			});
+		}
+	});
+
 	if (!xmlDoc) {
 		return alert("Something went wrong");
 	}
@@ -95,19 +106,25 @@ const handelSearch = () => {
 	//Empty the minimap
 	minimap.innerHTML = "";
 	rootEle.innerHTML = xmlDoc.documentElement.outerHTML;
-	let newText = findText(rootEle, text, highlightColor);
 
-	rootEle.innerHTML = newText;
-
-	displayMinimap();
+	//search for the text in the DOM
+	toBeSearched.forEach((element, index) => {
+		rootEle.innerHTML = findText(rootEle, element.text, element.bg, index);
+	}),
+		displayMinimap();
 };
 
 function displayMinimap() {
 	//Displaying the items in minimap
 	console.log(tracker);
-	//const screenHeight = window.innerHeight;
+	console.log(toBeSearched);
 
+	//const screenHeight = window.innerHeight;
+	if (tracker.length === 0) {
+		return alert("No Match Found");
+	}
 	minimap.removeAttribute("hidden");
+
 	tracker.forEach((element, index) => {
 		const newEelem = document.createElement("div");
 		newEelem.classList.add("minimap-item");
@@ -117,6 +134,10 @@ function displayMinimap() {
 				block: "center",
 			});
 		});
+		//Width should will be calculated depending on the tobeSearcheh length
+		newEelem.style.width = `${100 / toBeSearched.length}%`;
+		//calculating the position from left the element
+		newEelem.style.left = `${element.pos * 15}px`;
 
 		//calculating the margin to fit the elements in the screen
 		let margin;
@@ -127,6 +148,7 @@ function displayMinimap() {
 		newEelem.style.top = margin + "px";
 		newEelem.style.background = element.bg;
 		newEelem.style.position = "absolute";
+
 		minimap.appendChild(newEelem);
 	});
 }

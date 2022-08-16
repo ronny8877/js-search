@@ -5,12 +5,7 @@ const rootEle = document.getElementById("root");
 const uploadComponent = document.getElementById("upload-component");
 const searchComponent = document.getElementById("search-component");
 const minimap = document.getElementById("map");
-
-//TODO: THe search should not be listed here as we will spawn more then one element
-//programmatically then it will be a mess up
-
-const searchBar = document.getElementById("search");
-const colorBar = document.getElementById("search-color");
+const inputWrapper = document.querySelector(".input-wrapper");
 
 let file, xmlDoc;
 
@@ -34,7 +29,7 @@ const handleChange = (e) => {
 	reader.readAsText(file);
 
 	uploadComponent.style.display = "none";
-	searchComponent.removeAttribute("hidden");
+	searchComponent.style.display = "flex";
 };
 
 function getOffset(el) {
@@ -78,6 +73,8 @@ function findText(elem, text, bg, pos) {
 }
 
 const handelSearch = () => {
+	//TODO:: Add memoization for performance boost
+
 	let searchWrapper = searchComponent.querySelectorAll(".search-wrapper");
 	toBeSearched = [];
 	//checking all the search elements
@@ -109,17 +106,17 @@ const handelSearch = () => {
 
 	//search for the text in the DOM
 	toBeSearched.forEach((element, index) => {
-		rootEle.innerHTML = findText(rootEle, element.text, element.bg, index);
+		if (!element.text) return;
+		element.text.split(",").forEach((text) => {
+			rootEle.innerHTML = findText(rootEle, text, element.bg, index);
+		});
 	}),
 		displayMinimap();
 };
 
 function displayMinimap() {
 	//Displaying the items in minimap
-	console.log(tracker);
-	console.log(toBeSearched);
 
-	//const screenHeight = window.innerHeight;
 	if (tracker.length === 0) {
 		return alert("No Match Found");
 	}
@@ -139,7 +136,6 @@ function displayMinimap() {
 		//calculating the position from left the element
 		newEelem.style.left = `${element.pos * 15}px`;
 
-
 		//calculating the margin to fit the elements in the screen
 		let margin;
 
@@ -156,7 +152,6 @@ function displayMinimap() {
 
 const scrollToCustom = () => {
 	//scrolling to top of element
-	console.log("here");
 	window.scrollTo(0, 0);
 };
 
@@ -169,3 +164,23 @@ window.addEventListener("scroll", () => {
 		sc.style.display = "none";
 	}
 });
+
+const handelNewSearch = () => {
+	//if the number of children is grater then 5 show error message
+	if (inputWrapper.children.length > 4) {
+		return alert("You can only add 4 search items");
+	}
+
+	//creating a new search element in the
+	inputWrapper.appendChild(inputWrapper.children[0].cloneNode(true));
+};
+
+const handelReset = () => {
+	//Resetting the doc here
+	//Empty the tracker array
+	tracker.length = 0;
+	//Empty the minimap
+	minimap.innerHTML = "";
+	minimap.setAttribute("hidden", true);
+	rootEle.innerHTML = xmlDoc.documentElement.outerHTML;
+};

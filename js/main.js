@@ -139,6 +139,7 @@ function displayMinimap() {
 		//calculating the position from left the element
 		newEelem.style.left = `${element.pos * 15}px`;
 
+
 		//calculating the margin to fit the elements in the screen
 		let margin;
 

@@ -58,6 +58,7 @@ function findText(elem, text, bg, pos) {
 				pos,
 				bg,
 				id,
+				text,
 				offset: getOffset(elem.parentNode),
 			});
 			//replacing the text node with the mark element
@@ -73,8 +74,6 @@ function findText(elem, text, bg, pos) {
 }
 
 const handelSearch = () => {
-	//TODO:: Add memoization for performance boost
-
 	let searchWrapper = searchComponent.querySelectorAll(".search-wrapper");
 	toBeSearched = [];
 	//checking all the search elements
@@ -170,7 +169,6 @@ const handelNewSearch = () => {
 	if (inputWrapper.children.length > 4) {
 		return alert("You can only add 4 search items");
 	}
-
 	//creating a new search element in the
 	inputWrapper.appendChild(inputWrapper.children[0].cloneNode(true));
 };
